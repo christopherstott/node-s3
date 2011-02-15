@@ -10,6 +10,7 @@ var S3 = function(awsAccessKey, awsSecretKey, options){
 
   options = options || {}
 
+  this._host = options.host || 's3.amazonaws.com';
   this._storageType = options.storageType || 'STANDARD'
   this._acl = options.acl || 'private'
 
@@ -78,7 +79,7 @@ S3.prototype._getCanonicalizedAmzHeaders = function(headers) {
 S3.prototype._addGetHeaders = function(request) {
   request.headers = _({
     'Date': new Date().toUTCString(),
-    'Host': request.bucket + '.s3.amazonaws.com'
+    'Host': request.bucket + '.' + this._host
   }).extend(request.headers)
 
   this._addAuthorizationHeader(request, 'GET')
@@ -91,7 +92,7 @@ S3.prototype._addPutHeaders = function(request){
   var hash = crypto.createHash('md5').update(request.data).digest(encoding = 'base64')
 
   request.headers = _({
-    'Host': request.bucket + '.s3.amazonaws.com',
+    'Host': request.bucket + '.' + this._host,
     'Date': new Date().toUTCString(),
     'Content-Length': request.data.length,
     'Content-MD5' : hash,
